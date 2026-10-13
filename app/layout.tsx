@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Syntropy | Productivity Hub",
+  title: "Syntropy",
   description:
     "Tu espacio personal para organizar tareas, proyectos, hábitos y tiempo.",
 };
