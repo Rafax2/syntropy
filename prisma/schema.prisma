@@ -1,0 +1,95 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  color       String   @default("#A78BFA")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks       Task[]
+  notes       Note[]
+  timeEntries TimeEntry[]
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String       @default("")
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  projectId   String?
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  timeEntries TimeEntry[]
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+model Habit {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  color       String   @default("#34D399")
+  createdAt   DateTime @default(now())
+
+  logs        HabitLog[]
+}
+
+model HabitLog {
+  id        String   @id @default(cuid())
+  date      DateTime
+  completed Boolean  @default(false)
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+}
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  startedAt DateTime
+  endedAt   DateTime?
+  createdAt DateTime @default(now())
+
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
